@@ -1,0 +1,2 @@
+dist/**/honeygain binary
+dist/**/*.so* binary
