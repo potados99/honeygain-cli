@@ -1,7 +1,7 @@
 # honeygain-cli
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/potados99/honeygain-cli/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/potados99/honeygain-cli/main/install.sh | bash
 ```
 
 Honeygain only provides a Docker image for Linux — no standalone CLI. This repo extracts the CLI binary and its dependencies from the Docker image so you can run it directly. arm64 only.

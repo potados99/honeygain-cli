@@ -2,7 +2,7 @@
 # Install honeygain CLI on arm64 (aarch64) Linux systems.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/potados99/honeygain-cli/main/install.sh | bash
+#   wget -qO- https://raw.githubusercontent.com/potados99/honeygain-cli/main/install.sh | bash
 
 set -euo pipefail
 
@@ -11,6 +11,18 @@ BASE_URL="https://raw.githubusercontent.com/$REPO/main"
 INSTALL_BIN="/usr/local/bin"
 INSTALL_LIB="/usr/lib"
 
+# Use curl or wget, whichever is available
+if command -v curl &>/dev/null; then
+    fetch() { curl -fsSL -o "$1" "$2"; }
+    fetch_stdout() { curl -fsSL "$1"; }
+elif command -v wget &>/dev/null; then
+    fetch() { wget -qO "$1" "$2"; }
+    fetch_stdout() { wget -qO- "$1"; }
+else
+    echo "curl or wget is required." >&2
+    exit 1
+fi
+
 ARCH=$(uname -m)
 if [ "$ARCH" != "aarch64" ]; then
     echo "This script only supports arm64 (aarch64). Detected: $ARCH" >&2
@@ -18,7 +30,7 @@ if [ "$ARCH" != "aarch64" ]; then
 fi
 
 echo "==> Fetching latest version..."
-VERSION=$(curl -fsSL "$BASE_URL/latest")
+VERSION=$(fetch_stdout "$BASE_URL/latest")
 if [ -z "$VERSION" ]; then
     echo "Failed to get version info." >&2
     exit 1
@@ -31,9 +43,9 @@ TMP=$(mktemp -d)
 trap "rm -rf $TMP" EXIT
 
 echo "==> Downloading..."
-curl -fsSL -o "$TMP/honeygain" "$DIST_URL/honeygain"
-curl -fsSL -o "$TMP/libhg.so.2.0.0" "$DIST_URL/libhg.so.2.0.0"
-curl -fsSL -o "$TMP/libmsquic.so.2" "$DIST_URL/libmsquic.so.2"
+fetch "$TMP/honeygain" "$DIST_URL/honeygain"
+fetch "$TMP/libhg.so.2.0.0" "$DIST_URL/libhg.so.2.0.0"
+fetch "$TMP/libmsquic.so.2" "$DIST_URL/libmsquic.so.2"
 
 echo "==> Installing (sudo required)..."
 sudo install -m 755 "$TMP/honeygain" "$INSTALL_BIN/honeygain"
